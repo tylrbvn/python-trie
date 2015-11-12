@@ -3,23 +3,20 @@ class Node:
         self.label = letter
         self.branching_factor = 0
         self.descendants = {}  #Dictionary of descendants
-        self.eow = False
 
-    def __insert__(self, word):
+    def __insert__(self, string):
         """If the first letter isn't already an immediate descendant of the node
         then create a new node for that letter"""
-        letter = word[0]
+        letter = string[0]
         if letter not in self.descendants:
-            #print('Inserting node ' + letter + ' beneath ' + self.label)
             self.descendants[letter] = Node(letter)
-            #print('Updating branching factor of ' + self.label + ' to ' + str(self.branching_factor+1))
-            self.branching_factor += 1
-        """If there are remaining characters in the word"""
-        if len(word[1:]) > 0:
-            """Insert the remaining chunk of word below"""
-            self.descendants[letter].__insert__(word[1:])
-        else:
-            self.eow = True
+            """Update branching factor if not inserting terminal symbol"""
+            if letter != "$":
+                self.branching_factor += 1
+        """If there are remaining characters in the string"""
+        if len(string[1:]) > 0:
+            """Insert the remaining chunk of string below"""
+            self.descendants[letter].__insert__(string[1:])
 
     def __repr__(self):
         """Outputs the branching factor and the dictionary of descendants
@@ -34,25 +31,25 @@ class Trie:
     def __repr__(self):
         return str(self.root)
 
-    def insert(self, word):
-        self.root.__insert__(word)
+    def insert(self, string):
+        self.root.__insert__(string)
 
-    def annotate(self, word):
+    def annotate(self, string):
         node = self.root
         annotation = str()
-        for x in range(len(word)):
-            if word[x] in node.descendants:
-                node = node.descendants[word[x]]
+        for x in range(len(string)):
+            if string[x] in node.descendants:
+                node = node.descendants[string[x]]
                 if x > 0:
                     annotation += "-"
-                annotation += word[x] + "/" + str(node.branching_factor)
+                annotation += string[x] + "/" + str(node.branching_factor)
             else:
                 return "String not in trie"
         return annotation
 
-    def contains(self, word):
+    def contains(self, string):
         node = self.root
-        for letter in word:
+        for letter in string:
             if letter in node.descendants:
                 node = node.descendants[letter]
             else:
@@ -61,15 +58,16 @@ class Trie:
 
 """-------------------------------- MAIN PROGRAM --------------------------------"""
 test_trie = Trie()
+
 with open('wordList.txt') as file:
     for word in file:
-        test_trie.insert(word.rstrip())
+        test_trie.insert(word.rstrip() + "$")
     file.close()
-print(test_trie)
-print(test_trie.annotate("tea"))
-print(test_trie.annotate("in"))
-print(test_trie.annotate("true"))
-print(test_trie.contains("true"))
-print(test_trie.contains("in"))
-print(test_trie.contains("t"))
 
+print(test_trie)
+print(test_trie.contains("at"))  #Contains string 'at'? True
+print(test_trie.contains("at$"))  #Contains complete word 'at'? False
+print(test_trie.contains("ate$"))  #Contains complete word 'ate'? True
+print(test_trie.annotate("at"))
+print(test_trie.annotate("at$"))  #String (word) not in trie
+print(test_trie.annotate("ate$"))
