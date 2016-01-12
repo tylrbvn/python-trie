@@ -47,7 +47,7 @@ class Trie:
                 return "String not in trie"
         return annotation
 
-    def contains(self, string):
+    def contains_string(self, string):
         node = self.root
         for letter in string:
             if letter in node.descendants:
@@ -55,6 +55,9 @@ class Trie:
             else:
                 return False
         return True
+
+    def contains_word(self, string):
+        return(self.contains_string(string + "$"))
 
 """-------------------------------- MAIN PROGRAM --------------------------------"""
 test_trie = Trie()
@@ -65,9 +68,10 @@ with open('wordList.txt') as file:
     file.close()
 
 print(test_trie)
-print(test_trie.contains("at"))  #Contains string 'at'? True
-print(test_trie.contains("at$"))  #Contains complete word 'at'? False
-print(test_trie.contains("ate$"))  #Contains complete word 'ate'? True
-print(test_trie.annotate("at"))
-print(test_trie.annotate("at$"))  #String (word) not in trie
-print(test_trie.annotate("ate$"))
+print(test_trie.contains_word("work"))
+print(test_trie.contains_word("working"))
+print(test_trie.contains_word("bake"))
+print(test_trie.contains_word("baking"))
+print(test_trie.annotate("bake"))
+print(test_trie.contains_word("shake"))
+print(test_trie.contains_word("shaking"))
