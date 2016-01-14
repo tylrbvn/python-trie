@@ -41,11 +41,11 @@ class Trie:
             if string[x] in node.descendants:
                 node = node.descendants[string[x]]
                 if x > 0:
-                    annotation += "-"
-                annotation += string[x] + "/" + str(node.branching_factor)
+                    annotation += ", "
+                annotation += string[x] + "-" + str(node.branching_factor)
             else:
                 return "String not in trie"
-        return annotation
+        return("Annotation of '" + string + "': " + annotation)
 
     def contains_string(self, string):
         node = self.root
@@ -57,7 +57,7 @@ class Trie:
         return True
 
     def contains_word(self, string):
-        return(self.contains_string(string + "$"))
+        return("Trie contains word '" + string + "': " + str(self.contains_string(string + "$")))
 
 """-------------------------------- MAIN PROGRAM --------------------------------"""
 test_trie = Trie()
@@ -68,10 +68,10 @@ with open('wordList.txt') as file:
     file.close()
 
 print(test_trie)
-print(test_trie.contains_word("work"))
-print(test_trie.contains_word("working"))
-print(test_trie.contains_word("bake"))
-print(test_trie.contains_word("baking"))
-print(test_trie.annotate("bake"))
-print(test_trie.contains_word("shake"))
-print(test_trie.contains_word("shaking"))
+print(test_trie.annotate("but"))
+print(test_trie.annotate("cut"))
+print(test_trie.annotate("cuts"))
+print(test_trie.annotate("bread"))
+print(test_trie.annotate("spot"))
+print(test_trie.annotate("spots"))
+print(test_trie.annotate("spotted"))
