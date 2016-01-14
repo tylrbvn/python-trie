@@ -3,6 +3,7 @@ class Node:
         self.label = letter
         self.branching_factor = 0
         self.descendants = {}  #Dictionary of descendants
+        self.split_point = False
 
     def __insert__(self, string):
         """If the first letter isn't already an immediate descendant of the node
@@ -11,8 +12,11 @@ class Node:
         if letter not in self.descendants:
             self.descendants[letter] = Node(letter)
             """Update branching factor if not inserting terminal symbol"""
+            """Trigger update procedure to check if split_point"""
             if letter != "$":
                 self.branching_factor += 1
+                if ("""A rule is matched"""):
+                    self.split_point = True
         """If there are remaining characters in the string"""
         if len(string[1:]) > 0:
             """Insert the remaining chunk of string below"""
