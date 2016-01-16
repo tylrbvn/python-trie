@@ -1,3 +1,4 @@
+#!/usr/bin/env python
 class Node:
     def __init__(self, letter=str()):
         self.label = letter
@@ -11,12 +12,10 @@ class Node:
         letter = string[0]
         if letter not in self.descendants:
             self.descendants[letter] = Node(letter)
-            """Update branching factor if not inserting terminal symbol"""
             """Trigger update procedure to check if split_point"""
-            if letter != "$":
-                self.branching_factor += 1
-                if ("""A rule is matched"""):
-                    self.split_point = True
+            self.branching_factor += 1
+            if ("""A rule is matched"""):
+                self.split_point = True
         """If there are remaining characters in the string"""
         if len(string[1:]) > 0:
             """Insert the remaining chunk of string below"""
@@ -61,21 +60,15 @@ class Trie:
         return True
 
     def contains_word(self, string):
-        return("Trie contains word '" + string + "': " + str(self.contains_string(string + "$")))
+        return("Trie contains word '" + string + "': " + str(self.contains_string("^" + string + "$")))
 
 """-------------------------------- MAIN PROGRAM --------------------------------"""
 test_trie = Trie()
+txt_in = 'wordlist'
 
-with open('wordList.txt') as file:
+with open(txt_in + '.txt') as file:
     for word in file:
-        test_trie.insert(word.rstrip() + "$")
+        test_trie.insert("^" + word.rstrip() + "$")
     file.close()
 
-print(test_trie)
-print(test_trie.annotate("but"))
-print(test_trie.annotate("cut"))
-print(test_trie.annotate("cuts"))
-print(test_trie.annotate("bread"))
-print(test_trie.annotate("spot"))
-print(test_trie.annotate("spots"))
-print(test_trie.annotate("spotted"))
+print(test_trie.annotate("^aardvark$"))
