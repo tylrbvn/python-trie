@@ -1,4 +1,6 @@
 #!/usr/bin/env python
+import pygraphviz as pgv
+
 class Node:
     def __init__(self, letter=str()):
         self.label = letter
@@ -6,10 +8,19 @@ class Node:
         self.descendants = {}  #Dictionary of descendants
         self.split_point = False
 
-    def __insert__(self, string):
+    def __insert__(self, string, graph, last_key = '^'):
         """If the first letter isn't already an immediate descendant of the node
         then create a new node for that letter"""
         letter = string[0]
+
+        if (letter != '^'):
+            if (letter == '$'):
+                graph.add_node(last_key + letter, label = letter, color = 'red')
+            else:
+                graph.add_node(last_key + letter, label = letter)
+            graph.add_edge(last_key, last_key + letter)
+            last_key = last_key + letter
+
         if letter not in self.descendants:
             self.descendants[letter] = Node(letter)
             """Trigger update procedure to check if split_point"""
@@ -19,23 +30,24 @@ class Node:
         """If there are remaining characters in the string"""
         if len(string[1:]) > 0:
             """Insert the remaining chunk of string below"""
-            self.descendants[letter].__insert__(string[1:])
+            self.descendants[letter].__insert__(string[1:], graph, last_key)
 
     def __repr__(self):
         """Outputs the branching factor and the dictionary of descendants
         iteratively"""
         return str(self.branching_factor) + " " + str(self.descendants)
 
-
 class Trie:
     def __init__(self):
         self.root = Node()
+        self.graph = pgv.AGraph(direted=True)
+        self.graph.node_attr['style'] = 'filled'
 
     def __repr__(self):
         return str(self.root)
 
     def insert(self, string):
-        self.root.__insert__(string)
+        self.root.__insert__(string, self.graph)
 
     def annotate(self, string):
         node = self.root
@@ -62,9 +74,17 @@ class Trie:
     def contains_word(self, string):
         return("Trie contains word '" + string + "': " + str(self.contains_string("^" + string + "$")))
 
+    def draw_graph(self, png_name):
+        print('Processing graph layout...')
+        self.graph.layout('dot', args="-Grankdir=LR")
+        print('Drawing graph...')
+        self.graph.draw(png_name + '.png')
+        print("Graph '"  + png_name + ".png' successfully exported!")
+
 """-------------------------------- MAIN PROGRAM --------------------------------"""
 test_trie = Trie()
 txt_in = 'wordlist'
+png_out = 'trie'
 
 with open(txt_in + '.txt') as file:
     for word in file:
@@ -72,3 +92,4 @@ with open(txt_in + '.txt') as file:
     file.close()
 
 print(test_trie.annotate("^aardvark$"))
+test_trie.draw_graph(png_out)
