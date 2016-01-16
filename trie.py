@@ -15,7 +15,7 @@ class Node:
 
         if (letter != '^'):
             if (letter == '$'):
-                graph.add_node(last_key + letter, label = letter, color = 'red')
+                graph.add_node(last_key + letter, label = letter, style = 'filled', fillcolor = 'pink')
             else:
                 graph.add_node(last_key + letter, label = letter)
             graph.add_edge(last_key, last_key + letter)
@@ -40,8 +40,8 @@ class Node:
 class Trie:
     def __init__(self):
         self.root = Node()
-        self.graph = pgv.AGraph(direted=True)
-        self.graph.node_attr['style'] = 'filled'
+        self.graph = pgv.AGraph(directed=False)
+
 
     def __repr__(self):
         return str(self.root)
