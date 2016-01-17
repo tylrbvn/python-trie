@@ -8,24 +8,17 @@ class Node:
         self.descendants = {}  #Dictionary of descendants
         self.split_point = False
 
-    def __insert__(self, string, graph, terminal, last_key = str(), prev_branches = list()):
-        letter = string[0]
-        """-------------------- GRAPH BUILDING --------------------"""
-        """If not first letter or start symbol"""
-        if (last_key != ''):
-            """Add node, colour code s for emphasis"""
-            if (letter == terminal):
-                graph.add_node(last_key + letter, label = letter, style = 'filled', fillcolor = 'pink')
-            else:
-                graph.add_node(last_key + letter, label = letter)
-            """Add edge"""
-            graph.add_edge(last_key, last_key + letter)
-            last_key = last_key + letter
-        else:
-            """Add first node"""
-            graph.add_node(letter, label = letter)
-            last_key = letter
+    def __repr__(self):
+        """Outputs the branching factor and the dictionary of descendants
+        iteratively"""
+        string = str(self.branching_factor)
+        if (self.split_point):
+            string += "-SPLIT"
+        string += " " + str(self.descendants)
+        return string
 
+    def __insert__(self, string, prev_branches = list()):
+        letter = string[0]
         """-------------------- TRIE BUILDING --------------------"""
         """If the first letter isn't already an immediate descendant of the node
         then create a new node for that letter"""
@@ -41,7 +34,7 @@ class Node:
         """If there are remaining characters in the string"""
         if len(string[1:]) > 0:
             """Insert the remaining chunk of string below"""
-            self.descendants[letter].__insert__(string[1:], graph, terminal, last_key, [self.branching_factor] + prev_branches)
+            self.descendants[letter].__insert__(string[1:], [self.branching_factor] + prev_branches)
 
     def is_split_point(self, prev_branches):
         """Check to the left using list of previous preceeding factors"""
@@ -78,27 +71,41 @@ class Node:
         else:
             return False
 
-    def __repr__(self):
-        """Outputs the branching factor and the dictionary of descendants
-        iteratively"""
-        string = str(self.branching_factor)
-        if (self.split_point):
-            string += "-SPLIT"
-        string += " " + str(self.descendants)
-        return string
+    def build_graph(self, graph, terminal, last_key = str()):
+        if (self.label):
+            """If not first letter or start symbol"""
+            if (last_key != ''):
+                """Add node, colour code terminals for emphasis"""
+                if (self.label == terminal):
+                    graph.add_node(last_key + self.label, label = self.label, style = 'filled', fillcolor = 'pink')
+                elif (self.split_point):
+                    graph.add_node(last_key + self.label, label = self.label, style = 'filled', fillcolor = 'gold')
+                else:
+                    graph.add_node(last_key + self.label, label = self.label)
+                """Add edge"""
+                graph.add_edge(last_key, last_key + self.label)
+                last_key = last_key + self.label
+            else:
+                """Add first node"""
+                graph.add_node(self.label, label = self.label)
+                last_key = self.label
+
+        if (self.descendants):
+            for x in self.descendants:
+                self.descendants[x].build_graph(graph, terminal, last_key)
 
 class Trie:
     def __init__(self, start = str(), terminal = str()):
         self.root = Node()
-        self.graph = pgv.AGraph(directed=True)
         self.start = start
         self.terminal = terminal
+        self.graph = None
 
     def __repr__(self):
         return str(self.root)
 
     def insert(self, string):
-        self.root.__insert__(string, self.graph, self.terminal)
+        self.root.__insert__(string)
 
     def insert_word(self, word):
         self.insert(self.start + word + self.terminal)
@@ -131,7 +138,14 @@ class Trie:
     def contains_word(self, string):
         return self.contains(self.start + string + self.terminal)
 
+    def build_graph(self):
+        self.graph = pgv.AGraph(directed=True)
+        self.root.build_graph(self.graph, self.terminal)
+
     def draw_graph(self, png_name):
+        if not self.graph:
+            print('Building graph first...')
+            self.build_graph()
         print('Processing graph layout...')
         self.graph.layout('dot', args="-Grankdir=LR")
         print('Drawing graph...')
@@ -166,6 +180,10 @@ def insert_word(trie):
     trie.insert_word(word)
     print("Word '" + word + "' successfully inserted!")
 
+def build_graph(trie):
+    trie.build_graph()
+    print("Graph successfully built!")
+
 def export_graph(trie):
     png_out = raw_input('Enter desired name of png output: ')
     trie.draw_graph(png_out)
@@ -174,13 +192,14 @@ def export_graph(trie):
 print('Welcome! Create a trie from a txt file...\n')
 trie = create_trie()
 option = 0
-while (option != 7):
-    print('\n--- Menu ---\n1. Create new trie from txt file\n2. Print trie\n3. Insert a word\n4. Annotate a word\n5. Check if trie contains a word\n6. Export graph\n7. Exit\n')
+while (option != 8):
+    print('\n--- Menu ---\n1. Create new trie from txt file\n2. Print trie\n3. Insert a word\n4. Annotate a word\n5. Check if trie contains a word\n6. Build graph\n7. Export graph\n8. Exit\n')
     option = input('Enter option: ')
     if (option == 1): trie = create_trie()
     if (option == 2): print('\nTrie: ' + str(trie))
     if (option == 3): insert_word(trie)
     if (option == 4): annotate_word(trie)
     if (option == 5): contains_word(trie)
-    if (option == 6): export_graph(trie)
-    if (option == 7): print('\nGoodbye')
+    if (option == 6): build_graph(trie)
+    if (option == 7): export_graph(trie)
+    if (option == 8): print('\nGoodbye')
