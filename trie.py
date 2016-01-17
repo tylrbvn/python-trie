@@ -88,23 +88,52 @@ class Trie:
         return True
 
     def contains_word(self, string):
-        return("Trie contains word '" + string + "': " + str(self.contains(self.start + string + self.terminal)))
+        return self.contains(self.start + string + self.terminal)
 
     def draw_graph(self, png_name):
         print('Processing graph layout...')
         self.graph.layout('dot', args="-Grankdir=LR")
         print('Drawing graph...')
         self.graph.draw(png_name + '.png')
-        print("Graph '"  + png_name + ".png' successfully exported!")
 
-"""-------------------------------- MAIN PROGRAM --------------------------------"""
-test_trie = Trie(start = '^', terminal = '$')
-txt_in = 'wordlist'
-png_out = 'trie'
+"""-------------------- INTERFACE --------------------"""
+def create_trie():
+    txt_in = raw_input('Enter name of txt file: ')
+    start = raw_input('Enter desired start symbol (if any): ')
+    terminal = raw_input('Enter desired terminal symbol (if any): ')
+    trie = Trie(start, terminal)
+    with open(txt_in + '.txt') as file:
+        for word in file:
+            trie.insert_word(word.rstrip())
+        file.close()
+    print ('\nTrie successfully created!')
+    return trie
 
-with open(txt_in + '.txt') as file:
-    for word in file:
-        test_trie.insert_word(word.rstrip())
-    file.close()
+def annotate_word(trie):
+    word = raw_input('Enter word to annotate: ')
+    print(trie.annotate_word(word))
 
-test_trie.draw_graph(png_out)
+def contains_word(trie):
+    word = raw_input('Enter word to check: ')
+    if (trie.contains_word(word)):
+        print("Trie contains word '" + word + "'")
+    else:
+        print("Trie does NOT contain word '" + word + "'")
+
+def export_graph(trie):
+    png_out = raw_input('Enter desired name of png output: ')
+    trie.draw_graph(png_out)
+    print("Graph '"  + png_out + ".png' successfully exported!")
+
+print('Welcome! Create a trie from a txt file...\n')
+trie = create_trie()
+option = 0
+while (option != 6):
+    print('\n--- Menu ---\n1. Create new trie from txt file\n2. Print trie\n3. Annotate a word\n4. Check if trie contains a word\n5. Export graph\n6. Exit\n')
+    option = input('Enter option: ')
+    if (option == 1): trie = create_trie()
+    if (option == 2): print('\nTrie: ' + str(trie))
+    if (option == 3): annotate_word(trie)
+    if (option == 4): contains_word(trie)
+    if (option == 5): export_graph(trie)
+    if (option == 6): print('\nGoodbye')
