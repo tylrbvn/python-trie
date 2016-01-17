@@ -8,9 +8,8 @@ class Node:
         self.descendants = {}  #Dictionary of descendants
         self.split_point = False
 
-    def __insert__(self, string, graph, terminal, last_key = str()):
+    def __insert__(self, string, graph, terminal, last_key = str(), prev_branches = list()):
         letter = string[0]
-
         """-------------------- GRAPH BUILDING --------------------"""
         """If not first letter or start symbol"""
         if (last_key != ''):
@@ -34,17 +33,59 @@ class Node:
             self.descendants[letter] = Node(letter)
             """Trigger update procedure to check if split_point"""
             self.branching_factor += 1
-            if ("""A rule is matched"""):
-                self.split_point = True
+            self.split_point = self.is_split_point(prev_branches)
+            """Also need to now check immediate descendants' updated split point status"""
+            for desc in self.descendants:
+                self.descendants[desc].split_point = self.descendants[desc].is_split_point([self.branching_factor] + prev_branches)
+
         """If there are remaining characters in the string"""
         if len(string[1:]) > 0:
             """Insert the remaining chunk of string below"""
-            self.descendants[letter].__insert__(string[1:], graph, terminal, last_key)
+            self.descendants[letter].__insert__(string[1:], graph, terminal, last_key, [self.branching_factor] + prev_branches)
+
+    def is_split_point(self, prev_branches):
+        """Check to the left using list of previous preceeding factors"""
+        if (prev_branches):
+            p = 0
+            while p < len(prev_branches):
+                if (self.branching_factor < prev_branches[p]):
+                    return False
+                elif (self.branching_factor == prev_branches[p]):
+                    """Plateau to the left, so keep checking manually"""
+                    p += 1
+                elif (self.branching_factor > prev_branches[p]):
+                    """Check passed to the left, so quit the loop"""
+                    break
+            """If reached end of preecing factors without breaking i.e. passing"""
+            if (p == len(prev_branches)):
+                return False
+        else:
+            return False
+
+        """Check to the right using dictionary of descendants"""
+        if (self.descendants):
+            for x in self.descendants:
+                if (self.branching_factor < self.descendants[x].branching_factor):
+                    return False
+                """Pleateau to the right so check recursively"""
+                if (self.branching_factor == self.descendants[x].branching_factor):
+                    """Special case where in middle of a plateau, therefore not split point"""
+                    if (self.branching_factor == prev_branches[0]):
+                        return False
+                    else:
+                        self.split_point = self.descendants[x].is_split_point([self.branching_factor] + prev_branches)
+            return True
+        else:
+            return False
 
     def __repr__(self):
         """Outputs the branching factor and the dictionary of descendants
         iteratively"""
-        return str(self.branching_factor) + " " + str(self.descendants)
+        string = str(self.branching_factor)
+        if (self.split_point):
+            string += "-SPLIT"
+        string += " " + str(self.descendants)
+        return string
 
 class Trie:
     def __init__(self, start = str(), terminal = str()):
@@ -120,6 +161,11 @@ def contains_word(trie):
     else:
         print("Trie does NOT contain word '" + word + "'")
 
+def insert_word(trie):
+    word = raw_input('Enter word to insert: ')
+    trie.insert_word(word)
+    print("Word '" + word + "' successfully inserted!")
+
 def export_graph(trie):
     png_out = raw_input('Enter desired name of png output: ')
     trie.draw_graph(png_out)
@@ -128,12 +174,13 @@ def export_graph(trie):
 print('Welcome! Create a trie from a txt file...\n')
 trie = create_trie()
 option = 0
-while (option != 6):
-    print('\n--- Menu ---\n1. Create new trie from txt file\n2. Print trie\n3. Annotate a word\n4. Check if trie contains a word\n5. Export graph\n6. Exit\n')
+while (option != 7):
+    print('\n--- Menu ---\n1. Create new trie from txt file\n2. Print trie\n3. Insert a word\n4. Annotate a word\n5. Check if trie contains a word\n6. Export graph\n7. Exit\n')
     option = input('Enter option: ')
     if (option == 1): trie = create_trie()
     if (option == 2): print('\nTrie: ' + str(trie))
-    if (option == 3): annotate_word(trie)
-    if (option == 4): contains_word(trie)
-    if (option == 5): export_graph(trie)
-    if (option == 6): print('\nGoodbye')
+    if (option == 3): insert_word(trie)
+    if (option == 4): annotate_word(trie)
+    if (option == 5): contains_word(trie)
+    if (option == 6): export_graph(trie)
+    if (option == 7): print('\nGoodbye')

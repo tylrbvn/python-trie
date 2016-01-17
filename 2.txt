@@ -1,6 +1,7 @@
 but
 cut
 cuts
+cutsafe
 bread
 spot
 spots
