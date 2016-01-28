@@ -153,11 +153,11 @@ class Trie:
 
 """-------------------- INTERFACE --------------------"""
 def create_trie():
-    txt_in = raw_input('Enter name of txt file: ')
+    txt_in = raw_input('Enter name of txt file in dataset folder: ')
     start = raw_input('Enter desired start symbol (if any): ')
     terminal = raw_input('Enter desired terminal symbol (if any): ')
     trie = Trie(start, terminal)
-    with open(txt_in + '.txt') as file:
+    with open('dataset/' + txt_in + '.txt') as file:
         for word in file:
             trie.insert_word(word.rstrip())
         file.close()
@@ -186,8 +186,8 @@ def build_graph(trie):
 
 def export_graph(trie):
     png_out = raw_input('Enter desired name of png output: ')
-    trie.draw_graph(png_out)
-    print("Graph '"  + png_out + ".png' successfully exported!")
+    trie.draw_graph('graph/' + png_out)
+    print("Graph '"  + png_out + ".png' successfully exported to graph folder!")
 
 print('Welcome! Create a trie from a txt file...\n')
 trie = create_trie()
