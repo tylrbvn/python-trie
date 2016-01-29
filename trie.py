@@ -111,6 +111,7 @@ class Trie:
         self.root = Node()
         self.start = start
         self.terminal = terminal
+        self.words = list()
         self.graph = None
 
     def __repr__(self):
@@ -123,6 +124,7 @@ class Trie:
         self.root.__insert__(string)
 
     def insert_word(self, word):
+        self.words.append(word)
         self.insert(self.start + word + self.terminal)
 
     def annotate(self, string):
@@ -152,6 +154,9 @@ class Trie:
 
     def contains_word(self, string):
         return self.contains(self.start + string + self.terminal)
+
+    def get_words(self):
+        return self.words
 
     def build_graph(self):
         self.graph = pgv.AGraph(directed=True)
@@ -204,6 +209,8 @@ def export_graph(trie):
     trie.draw_graph('graph/' + png_out)
     print("Graph '"  + png_out + ".png' successfully exported to graph folder!")
 
+def get_words(trie):
+    print trie.get_words()
 """-------------------- MENU --------------------"""
 print('Welcome! Create a trie from a txt file...\n')
 trie = create_trie()
