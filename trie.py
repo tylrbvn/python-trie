@@ -166,7 +166,7 @@ class Trie:
         print('Drawing graph...')
         self.graph.draw(png_name + '.png')
 
-"""-------------------- INTERFACE --------------------"""
+"""-------------------- MENU FUNCTIONS --------------------"""
 def create_trie():
     txt_in = raw_input('Enter name of txt file in dataset folder: ')
     start = raw_input('Enter desired start symbol (if any): ')
@@ -176,7 +176,7 @@ def create_trie():
         for word in file:
             trie.insert_word(word.rstrip())
         file.close()
-    print ('\nTrie successfully created!')
+    print ('\nTrie successfully created! (' + str(len(trie)) + ' nodes)')
     return trie
 
 def annotate_word(trie):
@@ -204,17 +204,34 @@ def export_graph(trie):
     trie.draw_graph('graph/' + png_out)
     print("Graph '"  + png_out + ".png' successfully exported to graph folder!")
 
+"""-------------------- MENU --------------------"""
 print('Welcome! Create a trie from a txt file...\n')
 trie = create_trie()
+menu = ['Create new trie from txt file', #1
+        'Print trie', #2
+        'Get node count', #3
+        'Insert a word', #4
+        'Annotate a word', #5
+        'Check if trie contains a word', #6
+        'Build graph', #7
+        'Export graph', #8
+        'Exit' #9
+        ]
 option = 0
-while (option != 8):
-    print('\n--- Menu ---\n1. Create new trie from txt file\n2. Print trie\n3. Insert a word\n4. Annotate a word\n5. Check if trie contains a word\n6. Build graph\n7. Export graph\n8. Exit\n')
-    option = input('Enter option: ')
+while (option != 9):
+    print('\n-------------------- MENU --------------------')
+    cnt = 0
+    for opt in menu:
+        cnt += 1
+        print(str(cnt) + '. ' + opt)
+    option = input('\nEnter option: ')
+
     if (option == 1): trie = create_trie()
     if (option == 2): print('\nTrie: ' + str(trie))
-    if (option == 3): insert_word(trie)
-    if (option == 4): annotate_word(trie)
-    if (option == 5): contains_word(trie)
-    if (option == 6): build_graph(trie)
-    if (option == 7): export_graph(trie)
-    if (option == 8): print('\nGoodbye')
+    if (option == 3): print('Nodes in Trie: ' + str(len(trie)))
+    if (option == 4): insert_word(trie)
+    if (option == 5): annotate_word(trie)
+    if (option == 6): contains_word(trie)
+    if (option == 7): build_graph(trie)
+    if (option == 8): export_graph(trie)
+    if (option == 9): print('\nGoodbye')
