@@ -39,8 +39,12 @@ class Node:
 
         """If there are remaining characters in the string"""
         if len(string[1:]) > 0:
-            """Insert the remaining chunk of string below"""
-            self.descendants[letter].__insert__(string[1:], [self.branching_factor] + prev_branches)
+            """Don't append branching factor of empty root node"""
+            if (self.label != ''):
+                """Insert the remaining chunk of string below"""
+                self.descendants[letter].__insert__(string[1:], [self.branching_factor] + prev_branches)
+            else:
+                self.descendants[letter].__insert__(string[1:], prev_branches)
             """Trigger update procedure to see if (still) split point"""
             self.split_point = self.__is_split_point__(prev_branches)
 
