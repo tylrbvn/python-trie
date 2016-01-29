@@ -24,7 +24,7 @@ class Node:
         then create a new node for that letter"""
         if letter not in self.descendants:
             self.descendants[letter] = Node(letter)
-            """Trigger update procedure to check if split_point"""
+            """Trigger update procedure to check if split point"""
             self.branching_factor += 1
             self.split_point = self.is_split_point(prev_branches)
             """Also need to now check immediate descendants' updated split point status"""
@@ -35,6 +35,8 @@ class Node:
         if len(string[1:]) > 0:
             """Insert the remaining chunk of string below"""
             self.descendants[letter].__insert__(string[1:], [self.branching_factor] + prev_branches)
+            """Trigger update procedure to see if (still) split point"""
+            self.split_point = self.is_split_point(prev_branches)
 
     def is_split_point(self, prev_branches):
         """Check to the left using list of previous preceeding factors"""
@@ -49,7 +51,7 @@ class Node:
                 elif (self.branching_factor > prev_branches[p]):
                     """Check passed to the left, so quit the loop"""
                     break
-            """If reached end of preecing factors without breaking i.e. passing"""
+            """If reached end of preceeding factors without breaking i.e. passing"""
             if (p == len(prev_branches)):
                 return False
         else:
