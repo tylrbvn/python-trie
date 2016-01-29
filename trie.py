@@ -250,12 +250,12 @@ def print_all_segs(trie):
 
 def export_all_segs(trie):
     txt_out = raw_input('Enter desired name of text file: ')
-    file = open('segmentations/' + txt_out + '.txt', 'w')
+    file = open('segmentation/' + txt_out + '.txt', 'w')
     words = trie.get_words()
     for word in words:
         file.write(trie.segment_word(word)+'\n')
     file.close()
-    print("List of segmentations '"  + txt_out + ".txt' successfully exported to segmentations folder!")
+    print("List of segmentations '"  + txt_out + ".txt' successfully exported to segmentation folder!")
 
 """-------------------- MENU --------------------"""
 print('Welcome! Create a trie from a txt file...\n')
