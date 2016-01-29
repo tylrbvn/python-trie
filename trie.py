@@ -25,6 +25,7 @@ class Node:
 
     def __insert__(self, string, prev_branches = list()):
         letter = string[0]
+        #print("Inserting: " + string[0] + " from " + string)
         """-------------------- TRIE BUILDING --------------------"""
         """If the first letter isn't already an immediate descendant of the node
         then create a new node for that letter"""
@@ -79,6 +80,7 @@ class Node:
                         return False
                     else:
                         self.split_point = self.descendants[x].__is_split_point__([self.branching_factor] + prev_branches)
+            #print(self.label + ' is split point with prev_branches ' + str(prev_branches))
             return True
         else:
             return False
@@ -136,12 +138,31 @@ class Trie:
                 if x > 0:
                     annotation += ", "
                 annotation += string[x] + "-" + str(node.branching_factor)
+                """Highlight split points"""
+                if node.split_point:
+                    annotation += "-SPLIT"
             else:
-                return "String not in trie"
-        return("Annotation of '" + string + "': " + annotation)
+                return None
+        return(annotation)
 
     def annotate_word(self, word):
-        return self.annotate(self.start + word + self.terminal)
+            return(self.annotate(self.start + word + self.terminal))
+
+    def segment(self, string):
+        node = self.root
+        segmentation = str()
+        for x in range(len(string)):
+            if string[x] in node.descendants:
+                node = node.descendants[string[x]]
+                segmentation += string[x]
+                if node.split_point:
+                    segmentation += '-'
+            else:
+                return None
+        return segmentation
+
+    def segment_word(self, word):
+        return(self.segment(self.start + word + self.terminal)[1:-1])
 
     def contains(self, string):
         node = self.root
@@ -186,14 +207,24 @@ def create_trie():
 
 def annotate_word(trie):
     word = raw_input('Enter word to annotate: ')
-    print(trie.annotate_word(word))
+    if (trie.contains_word(word)):
+        print("Annotation of '" + word + "': " + trie.annotate_word(word))
+    else:
+        print("Trie does not contain word '" + word + "'!")
+
+def segment_word(trie):
+    word = raw_input('Enter word to segment: ')
+    if (trie.contains_word(word)):
+        print("Segmentation of '" + word + "': " + trie.segment_word(word))
+    else:
+        print("Trie does not contain word '" + word + "'!")
 
 def contains_word(trie):
     word = raw_input('Enter word to check: ')
     if (trie.contains_word(word)):
         print("Trie contains word '" + word + "'")
     else:
-        print("Trie does NOT contain word '" + word + "'")
+        print("Trie does not contain word '" + word + "'!")
 
 def insert_word(trie):
     word = raw_input('Enter word to insert: ')
@@ -211,6 +242,21 @@ def export_graph(trie):
 
 def get_words(trie):
     print trie.get_words()
+
+def print_all_segs(trie):
+    words = trie.get_words()
+    for word in words:
+        print(trie.segment_word(word))
+
+def export_all_segs(trie):
+    txt_out = raw_input('Enter desired name of text file: ')
+    file = open('segmentations/' + txt_out + '.txt', 'w')
+    words = trie.get_words()
+    for word in words:
+        file.write(trie.segment_word(word)+'\n')
+    file.close()
+    print("List of segmentations '"  + txt_out + ".txt' successfully exported to segmentations folder!")
+
 """-------------------- MENU --------------------"""
 print('Welcome! Create a trie from a txt file...\n')
 trie = create_trie()
@@ -219,13 +265,17 @@ menu = ['Create new trie from txt file', #1
         'Get node count', #3
         'Insert a word', #4
         'Annotate a word', #5
-        'Check if trie contains a word', #6
-        'Build graph', #7
-        'Export graph', #8
-        'Exit' #9
+        'Segment a word', #6
+        'Print all word segmentations', #7
+        'Export all word segmentations', #8
+        'Print list of words in trie', #9
+        'Check if trie contains a word', #10
+        'Build graph', #11
+        'Export graph', #12
+        'Exit' #13
         ]
 option = 0
-while (option != 9):
+while (option != len(menu)):
     print('\n-------------------- MENU --------------------')
     cnt = 0
     for opt in menu:
@@ -235,10 +285,14 @@ while (option != 9):
 
     if (option == 1): trie = create_trie()
     if (option == 2): print('\nTrie: ' + str(trie))
-    if (option == 3): print('Nodes in Trie: ' + str(len(trie)))
+    if (option == 3): print('Nodes in trie: ' + str(len(trie)))
     if (option == 4): insert_word(trie)
     if (option == 5): annotate_word(trie)
-    if (option == 6): contains_word(trie)
-    if (option == 7): build_graph(trie)
-    if (option == 8): export_graph(trie)
-    if (option == 9): print('\nGoodbye')
+    if (option == 6): segment_word(trie)
+    if (option == 7): print_all_segs(trie)
+    if (option == 8): export_all_segs(trie)
+    if (option == 9): get_words(trie)
+    if (option == 10): contains_word(trie)
+    if (option == 11): build_graph(trie)
+    if (option == 12): export_graph(trie)
+    if (option == 13): print('\nGoodbye')
