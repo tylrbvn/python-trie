@@ -26,19 +26,19 @@ class Node:
             self.descendants[letter] = Node(letter)
             """Trigger update procedure to check if split point"""
             self.branching_factor += 1
-            self.split_point = self.is_split_point(prev_branches)
+            self.split_point = self.__is_split_point__(prev_branches)
             """Also need to now check immediate descendants' updated split point status"""
             for desc in self.descendants:
-                self.descendants[desc].split_point = self.descendants[desc].is_split_point([self.branching_factor] + prev_branches)
+                self.descendants[desc].split_point = self.descendants[desc].__is_split_point__([self.branching_factor] + prev_branches)
 
         """If there are remaining characters in the string"""
         if len(string[1:]) > 0:
             """Insert the remaining chunk of string below"""
             self.descendants[letter].__insert__(string[1:], [self.branching_factor] + prev_branches)
             """Trigger update procedure to see if (still) split point"""
-            self.split_point = self.is_split_point(prev_branches)
+            self.split_point = self.__is_split_point__(prev_branches)
 
-    def is_split_point(self, prev_branches):
+    def __is_split_point__(self, prev_branches):
         """Check to the left using list of previous preceeding factors"""
         if (prev_branches):
             p = 0
@@ -68,12 +68,12 @@ class Node:
                     if (self.branching_factor == prev_branches[0]):
                         return False
                     else:
-                        self.split_point = self.descendants[x].is_split_point([self.branching_factor] + prev_branches)
+                        self.split_point = self.descendants[x].__is_split_point__([self.branching_factor] + prev_branches)
             return True
         else:
             return False
 
-    def build_graph(self, graph, terminal, last_key = str()):
+    def __build_graph__(self, graph, terminal, last_key = str()):
         if (self.label):
             """If not first letter or start symbol"""
             if (last_key != ''):
@@ -94,7 +94,7 @@ class Node:
 
         if (self.descendants):
             for x in self.descendants:
-                self.descendants[x].build_graph(graph, terminal, last_key)
+                self.descendants[x].__build_graph__(graph, terminal, last_key)
 
 class Trie:
     def __init__(self, start = str(), terminal = str()):
@@ -142,7 +142,7 @@ class Trie:
 
     def build_graph(self):
         self.graph = pgv.AGraph(directed=True)
-        self.root.build_graph(self.graph, self.terminal)
+        self.root.__build_graph__(self.graph, self.terminal)
 
     def draw_graph(self, png_name):
         if not self.graph:
