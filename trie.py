@@ -17,6 +17,12 @@ class Node:
         string += " " + str(self.descendants)
         return string
 
+    def __len__(self):
+        length = 1
+        for x in self.descendants:
+            length += len(self.descendants[x])
+        return length
+
     def __insert__(self, string, prev_branches = list()):
         letter = string[0]
         """-------------------- TRIE BUILDING --------------------"""
@@ -105,6 +111,9 @@ class Trie:
 
     def __repr__(self):
         return str(self.root)
+
+    def __len__(self):
+        return len(self.root)
 
     def insert(self, string):
         self.root.__insert__(string)
