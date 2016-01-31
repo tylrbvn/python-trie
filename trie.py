@@ -146,7 +146,7 @@ class Trie:
         return(annotation)
 
     def annotate_word(self, word):
-            return(self.annotate(self.start + word + self.terminal))
+        return(self.annotate(self.start + word + self.terminal))
 
     def segment(self, string):
         node = self.root
@@ -183,14 +183,8 @@ class Trie:
         self.graph = pgv.AGraph(directed=True)
         self.root.__build_graph__(self.graph, self.terminal)
 
-    def draw_graph(self, png_name):
-        if not self.graph:
-            print('Building graph first...')
-            self.build_graph()
-        print('Processing graph layout...')
-        self.graph.layout('dot', args="-Grankdir=LR")
-        print('Drawing graph...')
-        self.graph.draw(png_name + '.png')
+    def get_graph(self):
+        return self.graph
 
 """-------------------- MENU FUNCTIONS --------------------"""
 def create_trie():
@@ -237,7 +231,17 @@ def build_graph(trie):
 
 def export_graph(trie):
     png_out = raw_input('Enter desired name of png output: ')
-    trie.draw_graph('graph/' + png_out)
+    graph = trie.get_graph()
+    if not graph:
+        print('Building graph first...')
+        build_graph(trie)
+        graph = trie.get_graph()
+    print('Processing graph layout...')
+    graph.layout('dot', args="-Grankdir=LR")
+    print('Drawing graph...')
+    graph.draw('graph/' + png_out + '.png')
+    print("Graph '"  + png_out + ".png' successfully exported to graph folder!")
+
     print("Graph '"  + png_out + ".png' successfully exported to graph folder!")
 
 def get_words(trie):
