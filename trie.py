@@ -242,7 +242,6 @@ def export_graph(trie):
     graph.draw('graph/' + png_out + '.png')
     print("Graph '"  + png_out + ".png' successfully exported to graph folder!")
 
-    print("Graph '"  + png_out + ".png' successfully exported to graph folder!")
 
 def get_words(trie):
     print trie.get_words()
