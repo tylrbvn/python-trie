@@ -56,7 +56,13 @@ class Trie:
         return segmentation
 
     def segment_word(self, word):
-        return(self.segment(self.start + word + self.terminal)[1:-1])
+        segmentation = self.segment(self.start + word + self.terminal)
+        #Cut off start and terminal symbols
+        if (segmentation[0] == self.start):
+            segmentation = segmentation[1:]
+        if (segmentation[len(segmentation)-1] == (self.terminal)):
+            segmentation = segmentation[:-1]
+        return(segmentation)
 
     def contains(self, string):
         node = self.root
