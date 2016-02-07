@@ -1,14 +1,14 @@
 #!/usr/bin/env python
-import Node
-import pygraphviz
+import node, pygraphviz
 
-class Trie:
+class Tree:
     def __init__(self, start = str(), terminal = str()):
-        self.root = Node.Node()
+        self.root = node.Node()
         self.start = start
         self.terminal = terminal
         self.words = list()
         self.graph = None
+        self.graphdir = 'LR'
 
     def __repr__(self):
         return str(self.root)
@@ -85,3 +85,6 @@ class Trie:
 
     def get_graph(self):
         return self.graph
+
+    def get_graphdir(self):
+        return self.graphdir
