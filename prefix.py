@@ -45,15 +45,28 @@ class Tree:
     def segment(self, string):
         node = self.root
         segmentation = str()
-        for x in range(len(string)):
-            if string[x] in node.descendants:
-                node = node.descendants[string[x]]
-                segmentation += string[x]
+        for letter in string:
+            if letter in node.descendants:
+                node = node.descendants[letter]
+                segmentation += letter
                 if node.split_point:
                     segmentation += '-'
             else:
                 return None
         return segmentation
+
+    def get_split_point_pos(self, string):
+        word = self.start + string + self.terminal
+        node = self.root
+        positions = []
+        for x in range(len(word)):
+            if word[x] in node.descendants:
+                node = node.descendants[word[x]]
+                if node.split_point:
+                    positions.append(x)
+            else:
+                return None
+        return positions
 
     def segment_word(self, word):
         segmentation = self.segment(self.start + word + self.terminal)

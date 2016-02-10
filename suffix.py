@@ -46,10 +46,10 @@ class Tree:
     def segment(self, string):
         node = self.root
         segmentation = str()
-        for x in range(len(string)):
-            if string[x] in node.descendants:
-                node = node.descendants[string[x]]
-                segmentation += string[x]
+        for letter in string:
+            if letter in node.descendants:
+                node = node.descendants[letter]
+                segmentation += letter
                 if node.split_point:
                     segmentation += '-'
             else:
@@ -64,6 +64,21 @@ class Tree:
         if (segmentation[len(segmentation)-1] == (self.start)):
             segmentation = segmentation[:-1]
         return(segmentation)
+
+    def get_split_point_pos(self, string):
+        word = self.start + string[::-1] + self.terminal
+        node = self.root
+        positions = []
+        for x in range(len(word)):
+            if word[x] in node.descendants:
+                node = node.descendants[word[x]]
+                if node.split_point:
+                    #Split point position relative to if it
+                    #were the same split point in prefix tree
+                    positions.append(len(word)-x-2)
+            else:
+                return None
+        return positions
 
     def contains(self, string):
         node = self.root
