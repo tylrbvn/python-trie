@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-import prefix, suffix
+import prefix, suffix, operator
 """-------------------- INTERFACE HELPERS --------------------"""
 def create_trie():
     txt_in = raw_input('Enter name of txt file in dataset folder: ')
@@ -85,6 +85,34 @@ def export_all_segs(trie):
     file.close()
     print("List of segmentations '"  + txt_out + ".txt' successfully exported to segmentation folder!")
 
+def get_first_splits(trie):
+    first_splits = dict()
+    words = trie.get_words()
+    for word in words:
+        seg = trie.segment_word(word)
+        splits = seg.split("-")
+        prefix = splits[0]
+        if prefix in first_splits:
+            first_splits[prefix] += 1
+        else:
+            first_splits[prefix] = 1
+    first_splits = sorted(first_splits.items(), key=operator.itemgetter(1))
+    print(first_splits)
+
+def get_last_splits(trie):
+    first_splits = dict()
+    words = trie.get_words()
+    for word in words:
+        seg = trie.segment_word(word)
+        splits = seg.split("-")
+        prefix = splits[len(splits)-1]
+        if prefix in first_splits:
+            first_splits[prefix] += 1
+        else:
+            first_splits[prefix] = 1
+    first_splits = sorted(first_splits.items(), key=operator.itemgetter(1))
+    print(first_splits)
+
 """-------------------- MENU --------------------"""
 print('Welcome!')
 trie = prefix.Tree()
@@ -101,7 +129,9 @@ menu = ['Create new PREFIX tree (trie) from txt file', #1
         'Check if trie contains a word', #11
         'Build graph', #12
         'Export graph', #13
-        'Exit' #14
+        'Get first splits', #14
+        'Get last splits', #15
+        'Exit' #16
         ]
 
 option = 0
@@ -126,4 +156,6 @@ while (option != len(menu)):
     if (option == 11): contains_word(trie)
     if (option == 12): build_graph(trie)
     if (option == 13): export_graph(trie)
-    if (option == 14): print('\nGoodbye')
+    if (option == 14): get_first_splits(trie)
+    if (option == 15): get_last_splits(trie)
+    if (option == 16): print('\nGoodbye')
