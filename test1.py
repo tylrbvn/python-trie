@@ -6,7 +6,7 @@ sil = []
 print('Building trie')
 #Create tree containing sil words
 trie = prefix.Tree("","@")
-with open('../dataset/sil.txt') as file:
+with open('dataset/sil.txt') as file:
     for word in file:
         trie.insert_word(word.rstrip())
         sil.append(word.rstrip())
