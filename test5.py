@@ -10,7 +10,7 @@ def print_timing(func):
     return wrapper
 
 @print_timing
-def main(word_limit):
+def main(word_limit, mode):
     gold = []
     gold_answers = []
 
@@ -47,9 +47,11 @@ def main(word_limit):
         prefix_pos = trie.get_split_point_pos(gold[i])
         suffix_pos = suffix_tree.get_split_point_pos(gold[i])
         #Use to find matching tree split positions
-        #mixed_pos = set(prefix_pos).intersection(suffix_pos)
+        if mode == 0:
+            mixed_pos = set(prefix_pos).intersection(suffix_pos)
         #Use to find ALL tree split points
-        mixed_pos = list(set(prefix_pos + suffix_pos))
+        else:
+            mixed_pos = list(set(prefix_pos + suffix_pos))
 
         gold_pos = [pos for pos, ltr in enumerate(gold_answers[i]) if ltr == '1']
         #Remove the first and list split points from gold standard answer
@@ -72,6 +74,7 @@ def main(word_limit):
     print 'F score: ' + str(2*(precision*recall)/(precision+recall)) + "\n"
 
 maximum = 29827
-limit = maximum
+limit = 175
 print str(limit) + ' words'
-main(limit)
+#MODE 0 = MATCHING ONLY, 1 = COMBINE ALL SPLIT POINTS
+main(limit, 1)
