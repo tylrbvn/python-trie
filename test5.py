@@ -45,7 +45,16 @@ def main(word_limit, mode):
     for i in range(len(gold)):
         #print('Checking ' + gold[i])
         prefix_pos = trie.get_split_point_pos(gold[i])
+        #Remove split points at beginning and end of words in trie answers
+        for j in range(len(prefix_pos)):
+            if prefix_pos[j] == 0 or prefix_pos[j] == len(gold[i]):
+                print 'True'
+                del prefix_pos[j]
         suffix_pos = suffix_tree.get_split_point_pos(gold[i])
+        #Remove split points at beginning and end of words in trie answers
+        for j in range(len(suffix_pos)):
+            if suffix_pos[j] == 0 or suffix_pos[j] == len(gold[i]):
+                del suffix_pos[j]
         #Use to find matching tree split positions
         if mode == 0:
             mixed_pos = set(prefix_pos).intersection(suffix_pos)
@@ -63,18 +72,21 @@ def main(word_limit, mode):
         joint_count += len(set(mixed_pos).intersection(gold_pos))
 
     print 'Mixed tree split points: ' + str(mixed_count)
-    print 'Gold standard split points: ' + str(gold_count)
+    #print 'Gold standard split points: ' + str(gold_count)
     print 'Matching split points: ' + str(joint_count)
 
     precision = float(joint_count)/float(mixed_count)
     recall = float(joint_count)/float(gold_count)
 
-    print '\n' + 'Precision: ' + str(precision)
-    print 'Recall: ' + str(recall)
-    print 'F score: ' + str(2*(precision*recall)/(precision+recall)) + "\n"
+    #print '\n' + 'Precision: ' + str(precision)
+    #print 'Recall: ' + str(recall)
+    #print 'F score: ' + str(2*(precision*recall)/(precision+recall)) + "\n"
 
-maximum = 29827
-limit = 175
-print str(limit) + ' words'
 #MODE 0 = MATCHING ONLY, 1 = COMBINE ALL SPLIT POINTS
-main(limit, 1)
+limit = 25
+while limit <= 250:
+    print '\n' + str(limit) + ' words'
+    main(limit, 0)
+    limit += 25
+print 'All words'
+main(300000, 0)

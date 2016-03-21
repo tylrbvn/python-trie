@@ -48,6 +48,11 @@ def main(word_limit):
         del gold_pos[0]
         del gold_pos[len(gold_pos)-1]
 
+        #Remove split points at beginning and end of words in trie answers
+        for j in range(len(trie_pos)):
+            if trie_pos[j] == 0 or trie_pos[j] == len(gold[i]):
+                del trie_pos[j]
+
         trie_count += len(trie_pos)
         gold_count += len(gold_pos)
         joint_count += len(set(trie_pos).intersection(gold_pos))
@@ -63,7 +68,10 @@ def main(word_limit):
     print 'Recall: ' + str(recall)
     print 'F score: ' + str(2*(precision*recall)/(precision+recall)) + "\n"
 
-maximum = 29827
-limit = 75
-print str(limit) + ' words'
-main(limit)
+limit = 25
+while limit <= 250:
+    print str(limit) + ' words'
+    main(limit)
+    limit += 25
+print 'All words'
+main(300000)
