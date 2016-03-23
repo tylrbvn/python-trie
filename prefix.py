@@ -86,9 +86,16 @@ class Tree:
         self.root.__build_graph__(self.graph, self.terminal)
 
     def get_words(self):
+        return self.root.__get_words_below__(self.terminal)
+
+    def get_words_below(self, path):
         node = self.root
-        words = node.__get_words_below__(self.terminal)
-        return words
+        for letter in path:
+            if letter in node.descendants:
+                node = node.descendants[letter]
+            else:
+                return None
+        return node.__get_words_below__(self.terminal, path[:-1])
 
     def get_graph(self):
         return self.graph
