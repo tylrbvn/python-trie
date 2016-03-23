@@ -6,7 +6,6 @@ class Tree:
         self.root = node.Node()
         self.start = start
         self.terminal = terminal
-        self.words = list()
         self.graph = None
         self.graphdir = 'LR'
 
@@ -20,7 +19,6 @@ class Tree:
         self.root.__insert__(string)
 
     def insert_word(self, word):
-        self.words.append(word)
         self.insert(self.start + word + self.terminal)
 
     def annotate(self, string):
@@ -69,13 +67,7 @@ class Tree:
         return positions
 
     def segment_word(self, word):
-        segmentation = self.segment(self.start + word + self.terminal)
-        #Cut off start and terminal symbols
-        if (segmentation[0] == self.start):
-            segmentation = segmentation[1:]
-        if (segmentation[len(segmentation)-1] == (self.terminal)):
-            segmentation = segmentation[:-1]
-        return(segmentation)
+        return self.segment(self.start + word + self.terminal)
 
     def contains(self, string):
         node = self.root
@@ -89,12 +81,14 @@ class Tree:
     def contains_word(self, string):
         return self.contains(self.start + string + self.terminal)
 
-    def get_words(self):
-        return self.words
-
     def build_graph(self):
         self.graph = pygraphviz.AGraph(directed=True)
         self.root.__build_graph__(self.graph, self.terminal)
+
+    def get_words(self):
+        node = self.root
+        words = node.__get_words_below__(self.terminal)
+        return words
 
     def get_graph(self):
         return self.graph

@@ -74,14 +74,14 @@ def get_words(trie):
 def print_all_segs(trie):
     words = trie.get_words()
     for word in words:
-        print(trie.segment_word(word))
+        print(trie.segment(word))
 
 def export_all_segs(trie):
     txt_out = raw_input('Enter desired name of text file: ')
     file = open('segmentation/' + txt_out + '.txt', 'w')
     words = trie.get_words()
     for word in words:
-        file.write(trie.segment_word(word)+'\n')
+        file.write(trie.segment(word)+'\n')
     file.close()
     print("List of segmentations '"  + txt_out + ".txt' successfully exported to segmentation folder!")
 
@@ -89,7 +89,7 @@ def get_first_splits(trie):
     first_splits = dict()
     words = trie.get_words()
     for word in words:
-        seg = trie.segment_word(word)
+        seg = trie.segment(word)
         splits = seg.split("-")
         prefix = splits[0]
         if prefix in first_splits:
@@ -103,7 +103,7 @@ def get_last_splits(trie):
     first_splits = dict()
     words = trie.get_words()
     for word in words:
-        seg = trie.segment_word(word)
+        seg = trie.segment(word)
         splits = seg.split("-")
         prefix = splits[len(splits)-1]
         if prefix in first_splits:

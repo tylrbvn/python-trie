@@ -8,7 +8,7 @@ class Node:
 
     def __repr__(self):
         """Outputs the branching factor and the dictionary of descendants
-        iteratively"""
+        recursively"""
         string = str(self.branching_factor)
         if (self.split_point):
             string += "-SPLIT"
@@ -20,6 +20,18 @@ class Node:
         for x in self.descendants:
             length += len(self.descendants[x])
         return length
+
+    def __get_words_below__(self, terminal, path = ""):
+        words = list()
+        path += self.label
+        if len(self.descendants) > 0:
+            """Get words recursively from sorted (to enforce alphabetical order) descendants"""
+            for desc in sorted(self.descendants):
+                words += self.descendants[desc].__get_words_below__(terminal, path)
+        else:
+            """If a leaf node, append the word to list of words"""
+            words.append(path)
+        return words
 
     def __insert__(self, string, prev_branches = list()):
         letter = string[0]
