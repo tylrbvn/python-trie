@@ -23,7 +23,8 @@ class Node:
 
     def __get_words_below__(self, terminal, path = ""):
         words = list()
-        path += self.label
+        if self.label != terminal:
+            path += self.label
         if len(self.descendants) > 0:
             """Get words recursively from sorted (to enforce alphabetical order) descendants"""
             for desc in sorted(self.descendants):
@@ -31,6 +32,19 @@ class Node:
         else:
             """If a leaf node, append the word to list of words"""
             words.append(path)
+        return words
+
+    def __get_rev_words_below__(self, terminal, path = ""):
+        words = list()
+        if self.label != terminal:
+            path += self.label
+        if len(self.descendants) > 0:
+            """Get words recursively from sorted (to enforce alphabetical order) descendants"""
+            for desc in sorted(self.descendants):
+                words += self.descendants[desc].__get_rev_words_below__(terminal, path)
+        else:
+            """If a leaf node, append the word to list of words"""
+            words.append(path[::-1])
         return words
 
     def __insert__(self, string, prev_branches = list()):

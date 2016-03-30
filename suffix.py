@@ -6,7 +6,6 @@ class Tree:
         self.root = node.Node()
         self.start = start
         self.terminal = terminal
-        self.words = list()
         self.graph = None
         self.graphdir = 'RL'
 
@@ -20,7 +19,6 @@ class Tree:
         self.root.__insert__(string)
 
     def insert_word(self, word):
-        self.words.append(word)
         self.insert(self.start + word[::-1] + self.terminal)
 
     def annotate(self, string):
@@ -93,7 +91,17 @@ class Tree:
         return self.contains(self.start + string[::-1] + self.terminal)
 
     def get_words(self):
-        return self.words
+        return self.root.__get_rev_words_below__(self.terminal)
+
+    def get_words_below(self, path):
+        node = self.root
+        path = path[::-1]
+        for letter in path:
+            if letter in node.descendants:
+                node = node.descendants[letter]
+            else:
+                return None
+        return node.__get_rev_words_below__(self.terminal, path[:-1])
 
     def build_graph(self):
         self.graph = pygraphviz.AGraph(directed=True)
