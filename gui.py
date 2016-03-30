@@ -3,25 +3,52 @@ import prefix, suffix, operator, math, itertools, tkFileDialog, tkMessageBox, tk
 from Tkinter import *
 """-------------------- INTERFACE HELPERS --------------------"""
 def loadFile():
-    global lexicon
-    lexicon = list()
-    filename = tkFileDialog.askopenfilename()
-    with open(filename) as file:
-        for word in file:
-            if word not in lexicon:
-                lexicon.append(word)
-        file.close()
-    tkMessageBox.showinfo(app_name, str(len(lexicon)) + ' words loaded!')
+    filename = tkFileDialog.askopenfilename(filetypes=[('Text files', '*.txt')])
+    if filename:
+        global lexicon
+        lexicon = list()
+        with open(filename) as file:
+            for word in file:
+                if word not in lexicon:
+                    lexicon.append(word.rstrip())
+            file.close()
+        trie_btn.config(state = NORMAL)
+        ana_btn.config(state = NORMAL)
+        lex_btn.config(state = NORMAL)
+        trie_result_btn.config(state = DISABLED)
+        ana_result_btn.config(state = DISABLED)
+        tkMessageBox.showinfo(app_name, str(len(lexicon)) + ' words loaded!')
 
 def create_trie(start, terminal):
     global trie
     trie = prefix.Tree(start, terminal)
     for word in lexicon:
-        trie.insert_word(word.rstrip())
+        trie.insert_word(word)
     tkMessageBox.showinfo(app_name, 'Trie successfully created! (' + str(len(trie)) + ' nodes)')
+    trie_result_btn.config(state = NORMAL)
 
 def createTrie():
     d = TrieDialog(root)
+
+def viewLexicon():
+    results = ""
+    for word in lexicon:
+        results += word + '\n'
+    d = ResultDialog(root, 'Lexicon', results)
+
+def viewTrieSegs():
+    results = ""
+    for word in lexicon:
+        results += trie.segment_word(word) + '\n'
+    d = ResultDialog(root, 'Trie Segmentations', results)
+
+def viewAnalogySegs():
+    results = ""
+    for word in lexicon:
+        for sp in analogy_segs[word]:
+            word = word[:sp] + '-' + word[sp:]
+        results += word + '\n'
+    d = ResultDialog(root, 'Analogy Segmentations', results)
 
 def checkAnalogy():
     if len(lexicon) >= 4:
@@ -53,13 +80,18 @@ class TrieDialog(tkSimpleDialog.Dialog):
     def body(self, master):
         Label(master, text="Start symbol (if any):").grid(row=0)
         Label(master, text="Terminal symbol (if any):").grid(row=1)
-        self.start = str(Entry(master).grid(row=0, column=1))
-        self.terminal = str(Entry(master).grid(row=1, column=1))
+
+        self.start = Entry(master)
+        self.terminal = Entry(master)
+
+        self.start.grid(row=0, column=1)
+        self.terminal.grid(row=1, column=1)
+
         #Initial focus
         return self.start
 
     def apply(self):
-        create_trie(self.start, self.terminal)
+        create_trie(str(self.start.get()), str(self.terminal.get()))
 
 class AnalogDialog:
     def __init__(self, parent):
@@ -72,9 +104,10 @@ class AnalogDialog:
         b.pack(pady=5)
 
     def ok(self):
-        segs = {}
+        global analogy_segs
+        analogy_segs = {}
         for word in lexicon:
-            segs[word] = list()
+            analogy_segs[word] = list()
         analogy_count = 0
         combi_count = 0
         progress = 0
@@ -92,24 +125,58 @@ class AnalogDialog:
                         index = len(analogy[0][0])
                     else:
                         index = len(analogy[0][1])
-                    if index not in segs[word]:
-                        segs[word].append(index)
+                    if index not in analogy_segs[word]:
+                        analogy_segs[word].append(index)
             #print str(combi_count) + " out of " + str(no_of_combinations) + " (" + str((combi_count * 100)/no_of_combinations) + "%) combinations checked"
         ana_count = 0
         for word in lexicon:
-            analogy_pos = segs[word]
-            ana_count += len(analogy_pos)
+            ana_count += len(analogy_segs[word])
         tkMessageBox.showinfo(app_name, str(ana_count) + ' analogies found in the lexicon out of ' + str(self.no_of_combinations) + ' potential combinations!')
+        ana_result_btn.config(state = NORMAL)
+        self.top.destroy()
+
+class ResultDialog:
+    def __init__(self, parent, title, results):
+        top = self.top = Toplevel(parent)
+        self.results = results
+        Label(top, text=title).pack()
+        Button(top, text="Export", command=self.export).pack(pady=5)
+        Button(top, text="Close", command=self.close).pack(pady=5)
+        self.text = Text(top, width = 30, height = 50)
+        self.text.pack()
+        self.text.insert(END, results)
+
+    def export(self):
+        filename = tkFileDialog.asksaveasfilename(defaultextension='.txt')
+        if filename:
+            file = open(filename, 'w')
+            file.write(self.text.get('1.0', 'end'))
+            file.close()
+            tkMessageBox.showinfo(app_name, "File '" + filename + "' successfully exported!")
+
+    def close(self):
         self.top.destroy()
 
 app_name = 'Project'
 root = Tk()
 root.wm_title(app_name)
 
+x = 25
+y = 2
+global trie_btn, ana_btn, trie_result_btn, ana_result_btn
+
 # Code to add widgets will go here...
-Button(root, text ="Import .txt file", command = loadFile).pack()
-Button(root, text ="Generate trie", command = createTrie).pack()
-Button(root, text ="Check for analogies", command = checkAnalogy).pack()
+Button(root, text ="Import .txt file", command = loadFile, width = x, height = y).grid(row = 0, column = 0)
+lex_btn = Button(root, text ="View lexicon", state = DISABLED, command = viewLexicon, width = x, height = y)
+lex_btn.grid(row = 0, column = 1)
+trie_btn = Button(root, text ="Generate trie", state = DISABLED, command = createTrie, width = x, height = y)
+trie_btn.grid(row = 1, column = 0)
+trie_result_btn = Button(root, text ="View trie segmentations", state = DISABLED, command = viewTrieSegs, width = x, height = y)
+trie_result_btn.grid(row = 1, column = 1)
+ana_btn = Button(root, text ="Generate analogies", state = DISABLED, command = checkAnalogy, width = x, height = y)
+ana_btn.grid(row = 2, column = 0)
+ana_result_btn = Button(root, text ="View analogy segmentations", state = DISABLED, command = viewAnalogySegs, width = x, height = y)
+ana_result_btn.grid(row = 2, column = 1)
 root.mainloop()
 
 """
